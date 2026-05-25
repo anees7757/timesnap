@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/countdown_event.dart';
 
-final eventProvider = StateNotifierProvider<EventNotifier, List<CountdownEvent>>((ref) {
+// ── Event list state ──
+final eventProvider =
+    StateNotifierProvider<EventNotifier, List<CountdownEvent>>((ref) {
   return EventNotifier();
 });
 
@@ -25,12 +27,18 @@ class EventNotifier extends StateNotifier<List<CountdownEvent>> {
 
   Future<void> _saveEvents() async {
     final prefs = await SharedPreferences.getInstance();
-    final String encoded = json.encode(state.map((e) => e.toMap()).toList());
+    final String encoded =
+        json.encode(state.map((e) => e.toMap()).toList());
     await prefs.setString(_storageKey, encoded);
   }
 
   void addEvent(CountdownEvent event) {
     state = [event];
+    _saveEvents();
+  }
+
+  void updateEvent(CountdownEvent updated) {
+    state = state.map((e) => e.id == updated.id ? updated : e).toList();
     _saveEvents();
   }
 
@@ -48,8 +56,21 @@ class EventNotifier extends StateNotifier<List<CountdownEvent>> {
     }).toList();
     _saveEvents();
   }
+
+  void reorderEvents(int oldIndex, int newIndex) {
+    final updated = [...state];
+    if (newIndex > oldIndex) newIndex -= 1;
+    final item = updated.removeAt(oldIndex);
+    updated.insert(newIndex, item);
+    state = updated;
+    _saveEvents();
+  }
 }
 
+// ── Currently selected page index for the home PageView ──
+final selectedEventIndexProvider = StateProvider<int>((ref) => 0);
+
+// ── Convenience: pinned event (first pinned, or first in list) ──
 final pinnedEventProvider = Provider<CountdownEvent?>((ref) {
   final events = ref.watch(eventProvider);
   if (events.isEmpty) return null;

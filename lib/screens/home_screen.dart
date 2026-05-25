@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../models/countdown_event.dart';
 import '../providers/event_provider.dart';
 import '../providers/timer_provider.dart';
+import '../widgets/animated_background.dart';
 import '../widgets/flip_clock.dart';
+import '../widgets/liquid_glass.dart';
 import 'add_event_sheet.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -19,125 +21,127 @@ class HomeScreen extends ConsumerWidget {
     final tt = Theme.of(context).textTheme;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (pinnedEvent != null) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: cs.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(100),
-                        border: Border.all(
-                          color: cs.primary.withValues(alpha: 0.25),
-                          width: 1,
+      body: AnimatedBackground(
+        child: Stack(
+          children: [
+            Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (pinnedEvent != null) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 5,
                         ),
-                      ),
-                      child: Text(
-                        'TIMESNAP',
-                        style: tt.labelSmall?.copyWith(
-                          letterSpacing: 3,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 10,
-                          color: cs.primary.withValues(alpha: 0.85),
+                        decoration: BoxDecoration(
+                          color: cs.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(100),
+                          border: Border.all(
+                            color: cs.primary.withValues(alpha: 0.25),
+                            width: 1,
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    Text(
-                      pinnedEvent.title.toUpperCase(),
-                      style: GoogleFonts.bebasNeue(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: 8,
-                        color: cs.onSurface,
-                        height: 1.2,
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-
-                    const SizedBox(height: 56),
-
-                    FlipClock(
-                      duration: pinnedEvent.hasPassed
-                          ? Duration.zero
-                          : pinnedEvent.timeLeft,
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          pinnedEvent.hasPassed ? 'TIME PASSED' : 'REMAINING',
+                        child: Text(
+                          'TIMESNAP',
                           style: tt.labelSmall?.copyWith(
-                            letterSpacing: 4,
+                            letterSpacing: 3,
+                            fontWeight: FontWeight.w800,
                             fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: pinnedEvent.hasPassed
-                                ? cs.error.withValues(alpha: 0.6)
-                                : cs.primary.withValues(alpha: 0.5),
+                            color: cs.primary.withValues(alpha: 0.85),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 20),
 
-                    const SizedBox(height: 40),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.calendar_today_rounded,
-                          size: 12,
-                          color: cs.onSurface.withValues(alpha: 0.25),
+                      Text(
+                        pinnedEvent.title.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w400,
+                          letterSpacing: 8,
+                          color: cs.onSurface,
+                          height: 1.2,
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          DateFormat(
-                            'EEEE, MMMM d, yyyy  •  HH:mm',
-                          ).format(pinnedEvent.targetDate).toUpperCase(),
-                          style: tt.labelSmall?.copyWith(
-                            letterSpacing: 2.5,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: cs.onSurface.withValues(alpha: 0.35),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+
+                      const SizedBox(height: 56),
+
+                      FlipClock(
+                        duration: pinnedEvent.hasPassed
+                            ? Duration.zero
+                            : pinnedEvent.timeLeft,
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            pinnedEvent.hasPassed ? 'TIME PASSED' : 'REMAINING',
+                            style: tt.labelSmall?.copyWith(
+                              letterSpacing: 4,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: pinnedEvent.hasPassed
+                                  ? cs.error.withValues(alpha: 0.6)
+                                  : cs.primary.withValues(alpha: 0.5),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ] else ...[
-                    _buildEmptyState(context),
+                        ],
+                      ),
+
+                      const SizedBox(height: 40),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.calendar_today_rounded,
+                            size: 12,
+                            color: cs.onSurface.withValues(alpha: 0.25),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            DateFormat(
+                              'EEEE, MMMM d, yyyy  •  HH:mm',
+                            ).format(pinnedEvent.targetDate).toUpperCase(),
+                            style: tt.labelSmall?.copyWith(
+                              letterSpacing: 2.5,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: cs.onSurface.withValues(alpha: 0.35),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ] else ...[
+                      _buildEmptyState(context),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
-          ),
 
-          Positioned(
-            right: 24,
-            bottom: 28,
-            child: IconButton(
-              onPressed: () => _showAddEventSheet(context),
-              icon: Icon(
-                pinnedEvent == null ? Icons.add_rounded : Icons.edit_rounded,
-                size: 28, // slight bump to make icon button visible
-                color: cs.primary,
+            if (pinnedEvent != null) ...[
+              Positioned(
+                right: 24,
+                bottom: 28,
+                child: LiquidGlassIconButton(
+                  onTap: () => _showAddEventSheet(context, event: pinnedEvent),
+                  icon: Icons.edit_rounded,
+                  size: 44,
+                  iconColor: cs.primary,
+                ),
               ),
-            ),
-          ),
-        ],
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -212,12 +216,12 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  void _showAddEventSheet(BuildContext context) {
+  void _showAddEventSheet(BuildContext context, {CountdownEvent? event}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const AddEventSheet(),
+      builder: (context) => AddEventSheet(existingEvent: event),
     );
   }
 }
